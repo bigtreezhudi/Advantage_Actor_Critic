@@ -68,14 +68,6 @@ class Advantage_Actor_Critic():
         optimizer = tf.train.AdamOptimizer(0.0001).apply_gradients(zip(gredients, actor_vars))
         return I, delta, optimizer
 
-    def train(self, state, next_state, reward, done):
-
-        self.action_input = tf.placeholder("float", [None, self.action_dim])
-
-        self.y_input = tf.placeholder("float", [None, 1])
-        q_action = tf.reduce_sum(tf.multiply(self.q_value, self.action_input), reduction_indices=1)
-        self.cost = tf.reduce_mean(tf.square(self.y_input - q_action))
-        self.optimizer = tf.train.AdamOptimizer(0.0001).minimize(self.cost)
 
     def perceive(self, state, action, reward, next_state, done, I, step_num):
         one_hot_action = np.zeros(self.action_dim)
