@@ -19,7 +19,6 @@ class Advantage_Actor_Critic():
     def __init__(self, env):
         self.replay_buffer = deque()
         self.time_step = 0
-        self.epsilon = INITIAL_EPSILON
         self.action_dim = env.action_space.n
 
         self.critic_func_input, self.critic_func = self.create_network(1, False, "critic_func")
@@ -52,7 +51,7 @@ class Advantage_Actor_Critic():
     def create_training_critic_method(self):
         y_input = tf.placeholder("float", [None, 1])
         cost = tf.reduce_mean(tf.square(y_input - self.critic_func))
-        optimizer = tf.train.AdamOptimizer(0.0001).minimize(cost)
+        optimizer = tf.train.AdamOptimizer(1e-08).minimize(cost)
         return y_input, optimizer
 
     def create_training_actor_method(self):
@@ -65,7 +64,7 @@ class Advantage_Actor_Critic():
         coefficient = tf.multiply(-1.0, tf.divide(tf.multiply(I, delta), actor))
         log_actor = tf.multiply(coefficient, self.actor_func)
         gredients = tf.gradients(log_actor, actor_vars)
-        optimizer = tf.train.AdamOptimizer(0.0001).apply_gradients(zip(gredients, actor_vars))
+        optimizer = tf.train.AdamOptimizer(1e-08).apply_gradients(zip(gredients, actor_vars))
         return I, delta, optimizer
 
 

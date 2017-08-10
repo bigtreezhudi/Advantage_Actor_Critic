@@ -9,7 +9,7 @@ import pickle
 import time
 
 GAMMA = 0.99
-EPISODE = 1000000
+EPISODE = 100000
 TEST = 100
 MAX_STEP_PER_EPISODE = 10000
 
@@ -29,7 +29,7 @@ def main():
             action = agent.select_action(state)
             next_state, reward, done, _ = env.step(action)
             I = GAMMA * I
-            env.render()
+            # env.render()
             # time.sleep(1)
             agent.perceive(state, action, reward, next_state, done, I, step_num)
             goal += reward
@@ -40,7 +40,8 @@ def main():
                 episodes_rewards.append(goal)
                 break
                 # print "Current reward:", goal," Step number:", step_num
-        print("Episode: ", episode, " Last 100 episode average reward: ", np.average(episodes_rewards), " Toal step number: ", step_num, " eps: ", agent.epsilon)
+        if episode % 100 == 0:
+            print("Episode: ", episode, " Last 100 episode average reward: ", np.average(episodes_rewards), " Toal step number: ", step_num)
         #
         # if step_num > 2000000:
         #     break
