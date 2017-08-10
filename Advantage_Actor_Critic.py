@@ -112,7 +112,7 @@ class Advantage_Actor_Critic():
         })
 
         self.actor_optimizer.run(feed_dict={
-            self.action_input: state_batch,
+            self.actor_func_input: state_batch,
             self.I: I_batch,
             self.delta: delta_batch,
             self.action_input: action_batch,
@@ -123,15 +123,8 @@ class Advantage_Actor_Critic():
         action_dis = self.actor_func.eval(feed_dict={
             self.actor_func_input: [state]
         })[0]
-        sum = []
-        total = 0
-        for action_p in action_dis:
-            total += action_p
-            sum.append(total)
-        x = random.random()
-        for action in range(self.action_dim):
-            if x < sum[action]:
-                return action
+        action = np.random.choice(self.action_dim, 1, p=action_dis)
+        return action[0]
 
     def action(self, state):
         return np.argmax(self.q_value.eval(feed_dict={

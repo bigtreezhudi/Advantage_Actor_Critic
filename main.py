@@ -35,12 +35,12 @@ def main():
             goal += reward
             step_num += 1
             state = next_state
-        #     if done:
-        #         episodes_rewards.pop(0)
-        #         episodes_rewards.append(goal)
-        #         break
-        #         # print "Current reward:", goal," Step number:", step_num
-        # print("Episode: ", episode, " Last 100 episode average reward: ", np.average(episodes_rewards), " Toal step number: ", step_num, " eps: ", agent.epsilon)
+            if done:
+                episodes_rewards.pop(0)
+                episodes_rewards.append(goal)
+                break
+                # print "Current reward:", goal," Step number:", step_num
+        print("Episode: ", episode, " Last 100 episode average reward: ", np.average(episodes_rewards), " Toal step number: ", step_num, " eps: ", agent.epsilon)
         #
         # if step_num > 2000000:
         #     break
