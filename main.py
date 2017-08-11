@@ -9,62 +9,48 @@ import pickle
 import time
 
 GAMMA = 0.99
-EPISODE = 100000
+EPISODE = 350
 TEST = 100
-MAX_STEP_PER_EPISODE = 10000
-
 
 def main():
     env = gym.make("CartPole-v0")
     agent = Advantage_Actor_Critic(env)
-    episodes_rewards = [0] * 100
+    episodes_rewards = []
     avg_rewards = []
     skip_rewards = []
     step_num = 0
     for episode in range(EPISODE):
         goal = 0
-        I = 1
+        I = 1.0
         state = env.reset()
         while True:
             action = agent.select_action(state)
             next_state, reward, done, _ = env.step(action)
             I = GAMMA * I
             # env.render()
-            # time.sleep(1)
             agent.perceive(state, action, reward, next_state, done, I, step_num)
             goal += reward
             step_num += 1
             state = next_state
             if done:
-                episodes_rewards.pop(0)
+                if len(episodes_rewards) == 100:
+                    episodes_rewards.pop(0)
                 episodes_rewards.append(goal)
                 break
-                # print "Current reward:", goal," Step number:", step_num
+
+        print("Episode: ", episode, " Last 100 episode average reward: ", np.average(episodes_rewards), " Toal step number: ", step_num)
+        avg_rewards.append(np.average(episodes_rewards))
         if episode % 100 == 0:
-            print("Episode: ", episode, " Last 100 episode average reward: ", np.average(episodes_rewards), " Toal step number: ", step_num)
-        #
-        # if step_num > 2000000:
-        #     break
-        #
-        # if episode % 50 == 0:
-        #     skip_rewards.append(goal)
-        #
-        # if episode % 100 == 0:
-        #     avg_rewards.append(np.average(episodes_rewards))
-        #     out_file = open("avg_rewards.pkl",'wb')
-        #     out_file1 = open("skip_rewards.pkl",'wb')
-        #     pickle.dump(avg_rewards, out_file)
-        #     pickle.dump(skip_rewards, out_file1)
-        #     out_file.close()
-        #     out_file1.close()
-        #     agent.saver.save(agent.session, 'saved_networks/' + 'network' + '-dqn', global_step=episode)
+            out_file = open("avg_rewards.pkl",'wb')
+            pickle.dump(avg_rewards, out_file)
+            out_file.close()
+            agent.saver.save(agent.session, 'saved_networks/' + 'network' + '-dqn', global_step=episode)
 
     env.close()
 
 def play():
-    env = gym.make("BreakoutNoFrameskip-v4")
-    env = ScaledFloatFrame(wrap_dqn(env))
-    agent = DQN(env)
+    env = gym.make("CartPole-v0")
+    agent = Advantage_Actor_Critic(env)
     for episode in range(TEST):
         goal = 0
         step_num = 0
@@ -74,13 +60,12 @@ def play():
             next_state, reward, done, _ = env.step(action)
             step_num += 1
             env.render()
-            # time.sleep(0.01)
             goal += reward
             state = next_state
-            if done or step_num > MAX_STEP_PER_EPISODE:
+            if done:
                 print("Episode: ", episode, " Total reward: ", goal)
                 break
 
 if __name__ == '__main__':
     main()
-    # play()
+    play()
